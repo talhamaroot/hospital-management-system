@@ -145,8 +145,8 @@
 </style>
 
 <div class="receipt">
-    <h1>Receipt</h1>
-    <h2>Order #{{ $record->id }}</h2>
+    
+    <h2>Appointment Number # {{ $record->id }}</h2>
     <h3>{{ $record->created_at->format('d/m/Y H:i') }}</h3>
 
     <div class="receipt-items">
@@ -162,24 +162,36 @@
                 <td>{{ $record->doctor->name }}</td>
             </tr>
             <tr>
+                <td>Gender</td>
+                <td>{{ $record->patient->gender }}</td>
+            </tr>
+            @if ($record->temperature != "")
+            <tr>
                 <td>Temperature</td>
                 <td>{{ $record->temperature }}</td>
 
             </tr>
+            @endif
+            @if ($record->weight != "")
             <tr>
                 <td>Weight</td>
                 <td>{{ $record->weight }}</td>
             </tr>
+            @endif
+            
+            @if ($record->bp != "")
             <tr>
                 <td>Blood Pressure</td>
                 <td>{{ $record->bp }}</td>
             </tr>
+            @endif
+           
             </tbody>
         </table>
     </div>
 
     <div class="receipt-footer">
-        <p>Thank you for your purchase!</p>
+        <p>برائے کرم تشریف رکھیے اور اپنی باری کا انتظار کریں</p>
         <p><span>Have a nice day!</span></p>
     </div>
 </div>
