@@ -3,7 +3,6 @@
 namespace App\Filament\Receptionist\Resources;
 
 use App\Filament\Resources\PatientOperationResource\Pages;
-use App\Filament\Resources\PatientOperationResource\RelationManagers;
 use App\Models\Doctor;
 use App\Models\DoctorOperation;
 use App\Models\PatientOperation;
@@ -12,8 +11,6 @@ use Filament\Forms\Form;
 use Filament\Resources\Resource;
 use Filament\Tables;
 use Filament\Tables\Table;
-use Illuminate\Database\Eloquent\Builder;
-use Illuminate\Database\Eloquent\SoftDeletingScope;
 
 class PatientOperationResource extends Resource
 {
@@ -24,7 +21,6 @@ class PatientOperationResource extends Resource
     public static function form(Form $form): Form
     {
 
-
         return $form
             ->schema([
                 Forms\Components\Section::make([
@@ -33,20 +29,19 @@ class PatientOperationResource extends Resource
                         ->searchable()
                         ->label('Patient'),
                     Forms\Components\Select::make("doctor_id")
-                        ->options(Doctor::all()->pluck("name" , "id"))
+                        ->options(Doctor::all()->pluck("name", "id"))
                         ->label('Doctor')
                         ->live()
 
                         ->dehydrated(false),
                     Forms\Components\Select::make('doctor_operation_id')
 
-                        ->options(fn (Forms\Get $get) => \App\Models\DoctorOperation::where('doctor_id', $get('doctor_id'))->with('operation')->get()->pluck('operation.name', 'id'))
-                        ->hidden(fn (Forms\Get $get) => !$get('doctor_id'))
+                        ->options(fn(Forms\Get $get) => \App\Models\DoctorOperation::where('doctor_id', $get('doctor_id'))->with('operation')->get()->pluck('operation.name', 'id'))
+                        ->hidden(fn(Forms\Get $get) => !$get('doctor_id'))
                         ->live()
                         ->afterStateUpdated(function (Forms\Get $get, Forms\Set $set) {
                             $doctorOperationId = $get('doctor_operation_id');
                             $doctorOperation = DoctorOperation::find($doctorOperationId);
-
 
                             // Set default fee for the patient based on selected doctor
                             if ($doctorOperation) {
@@ -64,7 +59,7 @@ class PatientOperationResource extends Resource
                         ->type('number')
                         ->required(),
 
-                ])->columns(2)
+                ])->columns(2),
 
             ]);
     }
@@ -96,18 +91,27 @@ class PatientOperationResource extends Resource
                 Tables\Columns\TextColumn::make('status')
                     ->label('Status')
                     ->badge()
-                    ->color(fn ($record) => $record->status ? 'success' : 'warning')
+                    ->color(fn($record) => $record->status ? 'success' : 'warning')
                     ->getStateUsing(
-                        fn ($record) => $record->status ? 'Operation Completed' : 'Operation Pending'
+                        fn($record) => $record->status ? 'Operation Completed' : 'Operation Pending'
                     ),
             ])
             ->filters([
+                Tables\Filters\SelectFilter::make('patient_id')
+                    ->relationship('patient', 'name')
+                    ->label("Patient")
+
+                    ->searchable(),
+
+                Tables\Filters\SelectFilter::make('doctor_id')
+                    ->label("Doctor")
+                    ->relationship('doctor', 'name'),
                 Tables\Filters\SelectFilter::make("status")
-                ->options([
-                    "0" => "Pending",
-                    "1" => "Completed"
-                ])
-                ->default("0")
+                    ->options([
+                        "0" => "Pending",
+                        "1" => "Completed",
+                    ])
+                    ->default("0"),
             ])
             ->defaultSort('created_at', 'desc')
             ->actions([
@@ -124,14 +128,14 @@ class PatientOperationResource extends Resource
                             ->required(),
 
                     ])
-                    ->action(function (array $data,  $record) {
+                    ->action(function (array $data, $record) {
                         $record->update([
                             'status' => 1,
                             'expense' => $data['expense'],
                         ]);
                         $record->createLedgerEntry();
                     })
-                    ->hidden(fn ($record) => $record->status)
+                    ->hidden(fn($record) => $record->status),
 
             ])
             ->bulkActions([

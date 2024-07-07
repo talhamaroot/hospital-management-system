@@ -3,16 +3,14 @@
 namespace App\Filament\Receptionist\Resources;
 
 use App\Filament\Resources\PatientAppointmentResource\Pages;
-use App\Filament\Resources\PatientAppointmentResource\RelationManagers;
 use App\Models\PatientAppointment;
 use Filament\Actions\Action;
 use Filament\Forms;
 use Filament\Forms\Form;
 use Filament\Resources\Resource;
 use Filament\Tables;
+use Filament\Tables\Filters\SelectFilter;
 use Filament\Tables\Table;
-use Illuminate\Database\Eloquent\Builder;
-use Illuminate\Database\Eloquent\SoftDeletingScope;
 
 class PatientAppointmentResource extends Resource
 {
@@ -31,7 +29,7 @@ class PatientAppointmentResource extends Resource
                         ->label('Patient'),
                     Forms\Components\Select::make('doctor_id')
                         ->relationship('doctor', 'name')
-                       
+
                         ->live()
                         ->afterStateUpdated(function (Forms\Get $get, Forms\Set $set) {
                             $doctorId = $get('doctor_id');
@@ -57,7 +55,7 @@ class PatientAppointmentResource extends Resource
                         ->label('BP'),
                     Forms\Components\TextInput::make('weight')
                         ->label('Weight'),
-                ])->columns(2)
+                ])->columns(2),
 
             ]);
     }
@@ -80,7 +78,16 @@ class PatientAppointmentResource extends Resource
                     ->sortable(),
             ])
             ->filters([
-                //
+                SelectFilter::make('patient_id')
+                    ->relationship('patient', 'name')
+                    ->label("Patient")
+                    
+                    ->searchable(),
+
+                SelectFilter::make('doctor_id')
+                    ->relationship('doctor', 'name')
+                    ->label("Doctor")
+
             ])
             ->actions([
                 Tables\Actions\EditAction::make(),
@@ -97,8 +104,8 @@ class PatientAppointmentResource extends Resource
 
                             ->action(function ($livewire) {
                                 $livewire->js('window.print();');
-                            })
-                    ])
+                            }),
+                    ]),
 
             ])
             ->defaultSort('created_at', 'desc')

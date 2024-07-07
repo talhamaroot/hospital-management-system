@@ -102,6 +102,17 @@ class PatientOperationResource extends Resource
                     ),
             ])
             ->filters([
+                Tables\Filters\SelectFilter::make('patient_id')
+                    ->relationship('patient', 'name')
+
+
+
+                ->label("Patient")
+                    ->searchable(),
+
+                Tables\Filters\SelectFilter::make('doctor_id')
+                ->label("Doctor")
+                    ->relationship('doctorOperation.doctor', 'name'),
                 Tables\Filters\SelectFilter::make("status")
                 ->options([
                     "0" => "Pending",
