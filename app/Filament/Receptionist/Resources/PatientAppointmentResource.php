@@ -31,7 +31,7 @@ class PatientAppointmentResource extends Resource
                         ->label('Patient'),
                     Forms\Components\Select::make('doctor_id')
                         ->relationship('doctor', 'name')
-                        ->searchable()
+                       
                         ->live()
                         ->afterStateUpdated(function (Forms\Get $get, Forms\Set $set) {
                             $doctorId = $get('doctor_id');

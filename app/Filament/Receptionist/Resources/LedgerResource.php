@@ -60,7 +60,7 @@ class LedgerResource extends Resource
                     Forms\Components\Select::make("doctor_id")
                         ->relationship('doctor', 'name')
                         ->hidden(fn(Forms\Get $get) => $get('user_type') !== 'doctor')
-                        ->searchable()
+                       
                         ->afterStateUpdated(function (Forms\Get $get, Forms\Set $set) {
                             $doctor = \App\Models\Doctor::find($get('doctor_id'));
                             $set('previous_balance', Ledger::where("doctor_id" , $doctor->id)->sum('debit') - Ledger::where("doctor_id" , $doctor->id)->sum('credit'));
@@ -176,7 +176,7 @@ class LedgerResource extends Resource
                         Forms\Components\Select::make('doctor_id')
                             ->relationship('doctor', 'name')
                             ->hidden(fn(Forms\Get $get) => $get('account_type') !== 'doctor')
-                            ->searchable()
+                            
                             ->required(),
                         Forms\Components\Select::make('account')
                             ->options([
