@@ -17,3 +17,5 @@ use Illuminate\Support\Facades\Route;
 Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
     return $request->user();
 });
+Route::post("/attendance" , [\App\Http\Controllers\RestApiController::class , "postBiometricData"]);
+Route::post("/user" , [\App\Http\Controllers\RestApiController::class , "postBiometricDataUser"]);

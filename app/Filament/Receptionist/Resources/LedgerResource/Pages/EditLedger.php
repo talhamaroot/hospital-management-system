@@ -2,7 +2,7 @@
 
 namespace App\Filament\Receptionist\Resources\LedgerResource\Pages;
 
-use App\Filament\Resources\LedgerResource;
+use App\Filament\receptionist\Resources\LedgerResource;
 use Filament\Actions;
 use Filament\Resources\Pages\EditRecord;
 

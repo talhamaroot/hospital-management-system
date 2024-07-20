@@ -5,6 +5,7 @@ namespace App\Providers\Filament;
 use App\Filament\Pages\Auth\Login;
 use App\Filament\Pages\Dashboard;
 use App\Http\Middleware\Authenticate;
+use App\Http\Middleware\RedirectFilament;
 use Filament\Http\Middleware\DisableBladeIconComponents;
 use Filament\Http\Middleware\DispatchServingFilamentEvent;
 use Filament\Panel;
@@ -27,24 +28,21 @@ class AdminPanelProvider extends PanelProvider
             ->default()
             ->id('admin')
             ->login(Login::class)
-            ->discoverClusters(in: app_path('Filament/Clusters'), for: 'App\\Filament\\Clusters')
-            ->discoverResources(in: app_path('Filament/Resources'), for: 'App\\Filament\\Resources')
+            ->discoverClusters(in: app_path('Filament/admin/Clusters'), for: 'App\\Filament\\admin\\Clusters')
+            ->discoverResources(in: app_path('Filament/admin/Resources'), for: 'App\\Filament\\admin\\Resources')
             ->discoverPages(in: app_path('Filament/Pages'), for: 'App\\Filament\\Pages')
             ->pages([
                 Dashboard::class,
             ])
-            ->discoverWidgets(in: app_path('Filament/Widgets'), for: 'App\\Filament\\Widgets')
+            ->discoverWidgets(in: app_path('Filament/admin/Widgets'), for: 'App\\Filament\\admin\\Widgets')
             ->widgets([
-                Widgets\AccountWidget::class,
-                Widgets\FilamentInfoWidget::class,
+//                Widgets\AccountWidget::class,
+//                Widgets\FilamentInfoWidget::class,
             ])
             ->unsavedChangesAlerts()
             ->brandLogo(fn () => view('filament.app.logo'))
             ->brandLogoHeight('1.25rem')
-            ->navigationGroups([
-                'Shop',
-                'Blog',
-            ])
+
             ->databaseNotifications()
             ->middleware([
                 EncryptCookies::class,
@@ -58,6 +56,7 @@ class AdminPanelProvider extends PanelProvider
                 DispatchServingFilamentEvent::class,
             ])
             ->authMiddleware([
+                RedirectFilament::class,
                 Authenticate::class,
             ])
             ->plugin(

@@ -2,7 +2,7 @@
 
 namespace App\Filament\Receptionist\Resources\PatientAppointmentResource\Pages;
 
-use App\Filament\Resources\PatientAppointmentResource;
+use App\Filament\receptionist\Resources\PatientAppointmentResource;
 use Filament\Actions;
 use Filament\Resources\Pages\ListRecords;
 

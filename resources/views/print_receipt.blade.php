@@ -1,7 +1,7 @@
 <style>
     .receipt {
-        width: 80mm;
-        margin: 0 auto;
+        width: calc(75mm - 10px);
+        margin: 0px auto;
         font-family: Arial, sans-serif;
     }
 
@@ -76,34 +76,37 @@
 
     @media print {
         .receipt {
-            width: 80mm;
-            margin: 0 ;
+            width: calc(75mm - 10px);
+            margin-left: 5px;
+            padding-right: 10px;
             font-family: Arial, sans-serif;
-            font-size: 12px; /* Adjust font size for readability */
+            font-size: 14px; /* Adjust font size for readability */
         }
 
         .receipt h1 {
             text-align: center;
-            font-size: 16px; /* Larger heading for emphasis */
+            font-size: 18px; /* Larger heading for emphasis */
         }
 
         .receipt h2 {
             text-align: center;
-            font-size: 14px; /* Slightly smaller sub-heading */
+            font-size: 16px; /* Slightly smaller sub-heading */
         }
 
         .receipt h3 {
             text-align: center;
-            font-size: 12px;
+            font-size: 14px;
         }
 
-        .receipt p {
-            font-size: 10px; /* Smaller paragraph text */
+        .receipt p ,
+        .receipt .receipt-items table th,
+        .receipt .receipt-items table td{
+            font-size: 14px; /* Smaller paragraph text */
             margin: 5px 0; /* Adjust margins for compactness */
         }
 
         .receipt .receipt-items {
-            margin-top: 10px;
+            margin-top: 12px;
         }
 
         .receipt .receipt-items table {
@@ -126,7 +129,7 @@
 
         .receipt .receipt-footer p {
             text-align: center;
-            font-size: 10px;
+            font-size: 14px;
             margin: 3px 0; /* Adjust margin for footer */
         }
 
@@ -134,18 +137,22 @@
             margin-top: 5px;
             font-weight: bold;
         }
-        body {
+        body .receipt {
+            visibility: visible !important;
+        }
+        html , body {
             visibility: hidden;
         }
-        .receipt {
-            visibility: visible;
+        .row-start-2 {
+            grid-row-start: 0 !important;
         }
+
     }
 
 </style>
 
 <div class="receipt">
-    
+
     <h2>Appointment Number # {{ $record->id }}</h2>
     <h3>{{ $record->created_at->format('d/m/Y H:i') }}</h3>
 
@@ -178,14 +185,14 @@
                 <td>{{ $record->weight }}</td>
             </tr>
             @endif
-            
+
             @if ($record->bp != "")
             <tr>
                 <td>Blood Pressure</td>
                 <td>{{ $record->bp }}</td>
             </tr>
             @endif
-           
+
             </tbody>
         </table>
     </div>
@@ -197,3 +204,14 @@
 </div>
 
 
+<script>
+    window.onafterprint = function(e){
+        const queryString = window.location.search;
+    const urlParams = new URLSearchParams(queryString);
+    const url  = urlParams.get('redirectUrl')
+    window.location.replace(url);
+    };
+
+    window.print();
+
+</script>

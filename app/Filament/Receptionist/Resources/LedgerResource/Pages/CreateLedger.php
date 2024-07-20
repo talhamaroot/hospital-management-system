@@ -2,8 +2,7 @@
 
 namespace App\Filament\Receptionist\Resources\LedgerResource\Pages;
 
-use App\Filament\Resources\LedgerResource;
-use Filament\Actions;
+use App\Filament\receptionist\Resources\LedgerResource;
 use Filament\Resources\Pages\CreateRecord;
 
 class CreateLedger extends CreateRecord

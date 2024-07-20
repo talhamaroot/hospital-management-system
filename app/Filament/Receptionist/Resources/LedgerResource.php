@@ -2,8 +2,8 @@
 
 namespace App\Filament\Receptionist\Resources;
 
-use App\Filament\Resources\LedgerResource\Pages;
-use App\Filament\Resources\LedgerResource\RelationManagers;
+use App\Filament\receptionist\Resources\LedgerResource\Pages;
+use App\Filament\receptionist\Resources\LedgerResource\RelationManagers;
 use App\Models\Ledger;
 use Filament\Forms;
 use Filament\Forms\Form;
@@ -11,7 +11,7 @@ use Filament\Resources\Resource;
 use Filament\Tables;
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
-use Illuminate\Database\Eloquent\SoftDeletingScope;
+use Illuminate\Database\Eloquent\Model;
 
 class LedgerResource extends Resource
 {
@@ -29,12 +29,16 @@ class LedgerResource extends Resource
                             'employee' => 'Employee',
                             'patient' => 'Patient',
                             'doctor' => 'Doctor',
+                            "ot attendant" => "OT Attendant",
+                            "aneathesiologist" => "Anesthesiologist",
                             'system' => 'System',
                         ])
                         ->afterStateUpdated(function (Forms\Get $get, Forms\Set $set) {
                             $set('employee_id', null);
                             $set('patient_id', null);
                             $set('doctor_id', null);
+                            $set('ot_attendant_id', null);
+                            $set('anesthesiologist_id', null);
 
                         })
                         ->live()
@@ -45,25 +49,41 @@ class LedgerResource extends Resource
                         ->searchable()
                         ->afterStateUpdated(function (Forms\Get $get, Forms\Set $set) {
                             $employee = \App\Models\Employee::find($get('employee_id'));
-                            $set('previous_balance', Ledger::where("employee_id" , $employee->id)->sum('debit') - Ledger::where("employee_id" , $employee->id)->sum('credit'));
+                            $set('previous_balance', Ledger::where("employee_id", $employee->id)->sum('debit') - Ledger::where("employee_id", $employee->id)->sum('credit'));
                         })
                         ->live(),
                     Forms\Components\Select::make("patient_id")
                         ->relationship('patient', 'name')
                         ->hidden(fn(Forms\Get $get) => $get('user_type') !== 'patient')
                         ->searchable()
+                        ->getOptionLabelFromRecordUsing(fn(Model $record) => "{$record->name} (Phone : {$record->phone} )")
                         ->afterStateUpdated(function (Forms\Get $get, Forms\Set $set) {
                             $patient = \App\Models\Patient::find($get('patient_id'));
-                            $set('previous_balance', Ledger::where("patient_id" , $patient->id)->sum('debit') - Ledger::where("patient_id" , $patient->id)->sum('credit'));
+                            $set('previous_balance', Ledger::where("patient_id", $patient->id)->sum('debit') - Ledger::where("patient_id", $patient->id)->sum('credit'));
                         })
                         ->live(),
                     Forms\Components\Select::make("doctor_id")
                         ->relationship('doctor', 'name')
                         ->hidden(fn(Forms\Get $get) => $get('user_type') !== 'doctor')
-                       
                         ->afterStateUpdated(function (Forms\Get $get, Forms\Set $set) {
                             $doctor = \App\Models\Doctor::find($get('doctor_id'));
-                            $set('previous_balance', Ledger::where("doctor_id" , $doctor->id)->sum('debit') - Ledger::where("doctor_id" , $doctor->id)->sum('credit'));
+                            $set('previous_balance', Ledger::where("doctor_id", $doctor->id)->sum('debit') - Ledger::where("doctor_id", $doctor->id)->sum('credit'));
+                        })
+                        ->live(),
+                    Forms\Components\Select::make("ot_attendant_id")
+                        ->relationship('otAttendant', 'name')
+                        ->hidden(fn(Forms\Get $get) => $get('user_type') !== 'ot attendant')
+                        ->afterStateUpdated(function (Forms\Get $get, Forms\Set $set) {
+                            $otAttendant = \App\Models\OTAttendant::find($get('ot_attendant_id'));
+                            $set('previous_balance', Ledger::where("ot_attendant_id", $otAttendant->id)->sum('debit') - Ledger::where("ot_attendant_id", $otAttendant->id)->sum('credit'));
+                        })
+                        ->live(),
+                    Forms\Components\Select::make("anesthesiologist_id")
+                        ->relationship('anesthesiologist', 'name')
+                        ->hidden(fn(Forms\Get $get) => $get('user_type') !== 'anesthesiologist')
+                        ->afterStateUpdated(function (Forms\Get $get, Forms\Set $set) {
+                            $anesthesiologist = \App\Models\Anesthesiologist::find($get('anesthesiologist_id'));
+                            $set('previous_balance', Ledger::where("anesthesiologist_id", $anesthesiologist->id)->sum('debit') - Ledger::where("anesthesiologist_id", $anesthesiologist->id)->sum('credit'));
                         })
                         ->live(),
                     Forms\Components\Select::make("account")
@@ -71,10 +91,11 @@ class LedgerResource extends Resource
                             "capital" => "Capital",
                             "expense" => "Expense",
                             "revenue" => "Revenue",
+                            "ot expense" => "OT Expense",
                         ])
                         ->label('Account')
                         ->afterStateUpdated(function (Forms\Get $get, Forms\Set $set) {
-                            $set('previous_balance', Ledger::where("account" , $get('account'))->sum('debit') - Ledger::where("account" , $get('account'))->sum('credit'));
+                            $set('previous_balance', Ledger::where("account", $get('account'))->sum('debit') - Ledger::where("account", $get('account'))->sum('credit'));
                         })
                         ->hidden(fn(Forms\Get $get) => $get('user_type') !== 'system')
                         ->required(),
@@ -117,8 +138,14 @@ class LedgerResource extends Resource
                             if ($record->doctor_id) {
                                 return $record->doctor->name . " (Doctor)";
                             }
-                            if($record->account){
+                            if ($record->account) {
                                 return $record->account . " (System)";
+                            }
+                            if ($record->ot_attendant_id) {
+                                return $record->otAttendant->name . " (OT Attendant)";
+                            }
+                            if ($record->anesthesiologist_id) {
+                                return $record->anesthesiologist->name . " (Anesthesiologist)";
                             }
                         }
                     ),
@@ -147,10 +174,8 @@ class LedgerResource extends Resource
                     )
                     ->label('Created At'),
             ])
-
             ->filters([
                 Tables\Filters\SelectFilter::make('user')
-
                     ->label('Account Type')
                     ->form([
                         Forms\Components\Select::make('account_type')
@@ -158,15 +183,17 @@ class LedgerResource extends Resource
                                 'employee' => 'Employee',
                                 'patient' => 'Patient',
                                 'doctor' => 'Doctor',
+                                "ot attendant" => "OT Attendant",
+                                "anesthesiologist" => "Anesthesiologist",
                                 'system' => 'System',
                             ])
                             ->label('Account Type')
-
                             ->required(),
                         Forms\Components\Select::make('patient_id')
                             ->relationship('patient', 'name')
                             ->hidden(fn(Forms\Get $get) => $get('account_type') !== 'patient')
                             ->searchable()
+                            ->getOptionLabelFromRecordUsing(fn(Model $record) => "{$record->name} ({$record->phone})")
                             ->required(),
                         Forms\Components\Select::make('employee_id')
                             ->relationship('employee', 'name')
@@ -176,13 +203,21 @@ class LedgerResource extends Resource
                         Forms\Components\Select::make('doctor_id')
                             ->relationship('doctor', 'name')
                             ->hidden(fn(Forms\Get $get) => $get('account_type') !== 'doctor')
-                            
+                            ->required(),
+                        Forms\Components\Select::make('ot_attendant_id')
+                            ->relationship('otAttendant', 'name')
+                            ->hidden(fn(Forms\Get $get) => $get('account_type') !== 'ot attendant')
+                            ->required(),
+                        Forms\Components\Select::make('anesthesiologist_id')
+                            ->relationship('anesthesiologist', 'name')
+                            ->hidden(fn(Forms\Get $get) => $get('account_type') !== 'anesthesiologist')
                             ->required(),
                         Forms\Components\Select::make('account')
                             ->options([
-                                "capital" => "Capital",
+//                                "capital" => "Capital",
                                 "expense" => "Expense",
                                 "revenue" => "Revenue",
+                                "ot expense" => "OT Expense",
                             ])
                             ->label('Account')
                             ->hidden(fn(Forms\Get $get) => $get('account_type') !== 'system')
@@ -190,20 +225,27 @@ class LedgerResource extends Resource
 
                     ])
                     ->query(
-                        function (Builder $query ,array $data) {
-                            if($data['account_type']){
-                               if($data['account_type'] == 'patient'){
-                                        $query->where('patient_id' , $data['patient_id']);
-                                    }
-                                    if($data['account_type'] == 'employee'){
-                                        $query->where('employee_id' , $data['employee_id']);
-                                    }
-                                    if($data['account_type'] == 'doctor'){
-                                        $query->where('doctor_id' , $data['doctor_id']);
-                                    }
-                                    if($data['account_type'] == 'system') {
-                                        $query->where('account', $data['account']);
-                                    }
+                        function (Builder $query, array $data) {
+                            if ($data['account_type']) {
+                                if ($data['account_type'] == 'patient') {
+                                    $query->where('patient_id', $data['patient_id']);
+                                }
+                                if ($data['account_type'] == 'employee') {
+                                    $query->where('employee_id', $data['employee_id']);
+                                }
+                                if ($data['account_type'] == 'doctor') {
+                                    $query->where('doctor_id', $data['doctor_id']);
+                                }
+                                if ($data['account_type'] == 'system') {
+                                    $query->where('account', $data['account']);
+                                }
+                                if ($data['account_type'] == 'ot attendant') {
+                                    $query->where('ot_attendant_id', $data['ot_attendant_id']);
+                                }
+                                if ($data['account_type'] == 'anesthesiologist') {
+                                    $query->where('anesthesiologist_id', $data['anesthesiologist_id']);
+                                }
+
                             }
                         }
                     ),
@@ -223,7 +265,6 @@ class LedgerResource extends Resource
                                 fn(Builder $query, $date): Builder => $query->whereDate('created_at', '<=', $date),
                             );
                     })
-
 
 
             ])
@@ -248,7 +289,7 @@ class LedgerResource extends Resource
     public static function getPages(): array
     {
         return [
-            'index' => Pages\ListLedgers::route('/'),
+            'index' => LedgerResource\Pages\ListLedgers::route('/'),
 //            'create' => Pages\CreateLedger::route('/create'),
 //            'edit' => Pages\EditLedger::route('/{record}/edit'),
         ];

@@ -15,21 +15,5 @@ class Login extends BasePage
 
     }
 
-    public function getHeading(): string|Htmlable
-    {
-        return Filament::getCurrentPanel()->getId() === "admin" ? 'Login as Admin' : 'Login as Receptionist';
-    }
 
-    protected function getFormActions(): array
-    {
-
-        return [
-            $this->getAuthenticateFormAction(),
-              Action::make('register')
-                 ->link( )
-                  ->action(fn () => Filament::getCurrentPanel()->getId() === "admin" ? $this->redirect('/receptionist') : $this->redirect('/'))
-                 ->label(Filament::getCurrentPanel()->getId() === "admin" ? 'Login as Receptionist' : 'Login as admin')
-                 ->url(filament()->getRegistrationUrl())
-        ];
-    }
 }

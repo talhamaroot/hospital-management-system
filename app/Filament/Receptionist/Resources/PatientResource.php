@@ -2,16 +2,13 @@
 
 namespace App\Filament\Receptionist\Resources;
 
-use App\Filament\Resources\PatientResource\Pages;
-use App\Filament\Resources\PatientResource\RelationManagers;
+
 use App\Models\Patient;
 use Filament\Forms;
 use Filament\Forms\Form;
 use Filament\Resources\Resource;
 use Filament\Tables;
 use Filament\Tables\Table;
-use Illuminate\Database\Eloquent\Builder;
-use Illuminate\Database\Eloquent\SoftDeletingScope;
 
 class PatientResource extends Resource
 {
@@ -31,12 +28,6 @@ class PatientResource extends Resource
                     Forms\Components\TextInput::make("phone")
                         ->label("Phone")
                         ->required(),
-                    Forms\Components\TextInput::make("address")
-                        ->label("Address")
-                        ->required(),
-                    Forms\Components\TextInput::make("age")
-                        ->label("Age")
-                        ->required(),
                     Forms\Components\Select::make("gender")
                         ->label("Gender")
                         ->options([
@@ -44,11 +35,18 @@ class PatientResource extends Resource
                             "female" => "Female",
                         ])
                         ->required(),
+                    Forms\Components\TextInput::make("address")
+                        ->label("Address")
+                    // ->required()
+                    ,
+                    Forms\Components\TextInput::make("age")
+                        ->label("Age"),
+
 
                     Forms\Components\TextInput::make("cnic")
                         ->label("CNIC")
                         ->mask('99999-9999999-9'),
-                    Repeater::make("appointment")
+                    Forms\Components\Repeater::make("appointment")
                         ->relationship("appointment")
                         ->schema([
                             Forms\Components\Select::make('doctor_id')
@@ -67,9 +65,10 @@ class PatientResource extends Resource
                             Forms\Components\TextInput::make('price')
                                 ->label('Price')
                                 ->type('number')
+                                ->readOnly()
                                 ->required(),
                             Forms\Components\TextInput::make('paid')
-                                ->label('Paid')
+                                ->label('Payment Received')
                                 ->type('number')
                                 ->required(),
                             Forms\Components\TextInput::make('temperature')
@@ -108,11 +107,14 @@ class PatientResource extends Resource
             ])
             ->defaultSort('created_at', 'desc')
             ->actions([
+                Tables\Actions\Action::make("View Ledger")
+                ->url(fn ($record) => PatientLedgerResource::getUrl('ledger' , ["record" => $record] )),
                 Tables\Actions\EditAction::make(),
+
             ])
             ->bulkActions([
                 Tables\Actions\BulkActionGroup::make([
-                    Tables\Actions\DeleteBulkAction::make(),
+//                    Tables\Actions\DeleteBulkAction::make(),
                 ]),
             ]);
     }
@@ -120,16 +122,16 @@ class PatientResource extends Resource
     public static function getRelations(): array
     {
         return [
-            RelationManagers\LedgerRelationManager::class,
+            PatientResource\RelationManagers\LedgerRelationManager::class,
         ];
     }
 
     public static function getPages(): array
     {
         return [
-            'index' => Pages\ListPatients::route('/'),
-            'create' => Pages\CreatePatient::route('/create'),
-            'edit' => Pages\EditPatient::route('/{record}/edit'),
+            'index' => PatientResource\Pages\ListPatients::route('/'),
+            'create' => PatientResource\Pages\CreatePatient::route('/create'),
+            'edit' => PatientResource\Pages\EditPatient::route('/{record}/edit'),
         ];
     }
 }

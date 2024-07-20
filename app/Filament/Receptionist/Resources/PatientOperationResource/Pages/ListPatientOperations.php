@@ -2,7 +2,7 @@
 
 namespace App\Filament\Receptionist\Resources\PatientOperationResource\Pages;
 
-use App\Filament\Resources\PatientOperationResource;
+use App\Filament\receptionist\Resources\PatientOperationResource;
 use Filament\Actions;
 use Filament\Resources\Pages\ListRecords;
 

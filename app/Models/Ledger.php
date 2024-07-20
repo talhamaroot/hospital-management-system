@@ -5,10 +5,12 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Spatie\MediaLibrary\HasMedia;
+use Spatie\MediaLibrary\InteractsWithMedia;
 
-class Ledger extends Model
+class Ledger extends Model implements HasMedia
 {
-    use HasFactory;
+    use HasFactory , InteractsWithMedia;
 
 
     protected $table = 'ledger';
@@ -20,6 +22,8 @@ class Ledger extends Model
         'debit',
         'credit',
         'description',
+        'ot_attendant_id',
+        "account"
 
     ];
 
@@ -36,5 +40,17 @@ class Ledger extends Model
     public function employee() : BelongsTo
     {
         return $this->belongsTo(Employee::class);
+    }
+
+
+    public function otAttendant() : BelongsTo
+    {
+        return $this->belongsTo(OTAttendant::class);
+    }
+
+
+    public function anesthesiologist() : BelongsTo
+    {
+        return $this->belongsTo(Anesthesiologist::class);
     }
 }

@@ -3,6 +3,7 @@
 namespace App\Providers\Filament;
 
 use App\Filament\Pages\Auth\Login;
+use App\Http\Middleware\RedirectFilament;
 use Filament\Http\Middleware\Authenticate;
 use Filament\Http\Middleware\DisableBladeIconComponents;
 use Filament\Http\Middleware\DispatchServingFilamentEvent;
@@ -38,8 +39,8 @@ class ReceptionistPanelProvider extends PanelProvider
             ->brandLogo(fn () => view('filament.app.logo'))
             ->discoverWidgets(in: app_path('Filament/Receptionist/Widgets'), for: 'App\\Filament\\Receptionist\\Widgets')
             ->widgets([
-                Widgets\AccountWidget::class,
-                Widgets\FilamentInfoWidget::class,
+//                Widgets\AccountWidget::class,
+//                Widgets\FilamentInfoWidget::class,
             ])
             ->middleware([
                 EncryptCookies::class,
@@ -53,6 +54,7 @@ class ReceptionistPanelProvider extends PanelProvider
                 DispatchServingFilamentEvent::class,
             ])
             ->authMiddleware([
+                RedirectFilament::class,
                 Authenticate::class,
             ]);
     }

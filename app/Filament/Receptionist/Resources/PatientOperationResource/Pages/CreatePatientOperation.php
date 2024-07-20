@@ -2,8 +2,7 @@
 
 namespace App\Filament\Receptionist\Resources\PatientOperationResource\Pages;
 
-use App\Filament\Resources\PatientOperationResource;
-use Filament\Actions;
+use App\Filament\receptionist\Resources\PatientOperationResource;
 use Filament\Resources\Pages\CreateRecord;
 
 class CreatePatientOperation extends CreateRecord
