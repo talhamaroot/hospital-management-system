@@ -37,13 +37,13 @@ class PatientAppointment extends Model
             "doctor_id" => $this->doctor_id,
             "debit" => $this->doctor->outdoor_sharing / 100 * $this->price,
             "credit" => 0,
-            "description" => "Outdoor sharing from patient " . $this->patient->name,
+            "description" => "OPD Share By " . $this->patient->name,
         ]);
         Ledger::create([
             "account" => "revenue",
             "debit" => (100 - $this->doctor->outdoor_sharing) / 100 * $this->price,
             "credit" => 0,
-            "description" => "Outdoor sharing from patient " . $this->patient->name,
+            "description" => "OPD Share By " . $this->patient->name,
         ]);
     }
 

@@ -153,13 +153,14 @@
 
 <div class="receipt">
 
-    <h2>Ledger Report {{$doctor->name}}</h2>
+ 
 
 
     <div class="receipt-items">
         <table border="1" cellspacing="0" cellpadding="4">
             <thead>
             <tr>
+                <th>Account</th>
                 <th>Date</th>
                 <th>Description</th>
                 <th>Debit</th>
@@ -177,12 +178,34 @@
                
                 <td>{{ $balance }}</td>
             </tr>
-            @foreach($ledger as $row)
+            @foreach($query as $row)
                     <?php
                     $balance += $row->debit - $row->credit;
                     ?>
 
                 <tr>
+                    <td>
+                       <?php
+                        if ($row->patient_id) {
+                            echo $row->patient->name . " (Patient)";
+                        }
+                        if ($row->employee_id) {
+                            echo $row->employee->name . " (Employee)";
+                        }
+                        if ($row->doctor_id) {
+                            echo $row->doctor->name . " (Doctor)";
+                        }
+                        if ($row->account) {
+                            echo $row->account . " (System)";
+                        }
+                        if ($row->ot_attendant_id) {
+                            echo $row->otAttendant->name . " (OT Attendant)";
+                        }
+                        if ($row->anesthesiologist_id) {
+                            echo $row->anesthesiologist->name . " (Anesthesiologist)";
+                        }
+                       ?>
+                    </td>
                     <td>{{\Carbon\Carbon::create($row->created_at)->format('d/m/Y H:i')}}</td>
                     <td>{{ $row->description }}</td>
                     <td>{{ $row->debit }}</td>
@@ -196,20 +219,17 @@
 
 
 
-    <div class="receipt-footer">
-        _________________
-        <br />
-        Doctor Signature
-        <p>Printed on {{ \Carbon\Carbon::now()->format('d/m/Y H:i') }}</p>
-    </div>
-
+ 
 
 </div>
 
 
 <script>
 
-
+    window.onafterprint = function(e){
+      
+        window.close();
+    };
     window.print();
 
 </script>

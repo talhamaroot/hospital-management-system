@@ -67,12 +67,20 @@ class ListDoctorLedgers extends ListRecords
                         ->label('Description')
                         ->readOnly()
                         ->default("Paid to Doctor"),
+                        TextInput::make('balance')
+                        ->label('Previous Balance')
+                        ->default(function () {
+                            return Ledger::query()->where('doctor_id', $this->doctorId)->sum('debit') - Ledger::query()->where('doctor_id', $this->doctorId)->sum('credit');
+                        })
+                        ->readOnly()
+                        ->type('number')
+                        ->required(),
                     TextInput::make('credit')
                         ->label('Total Amount')
                         ->default(function () {
                             return Ledger::query()->where('doctor_id', $this->doctorId)->sum('debit') - Ledger::query()->where('doctor_id', $this->doctorId)->sum('credit');
                         })
-                        ->readOnly()
+                      
                         ->type('number')
                         ->required(),
                     TextInput::make("image_url")
