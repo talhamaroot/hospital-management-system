@@ -87,7 +87,7 @@ class Controller extends BaseController
         $date_to = $date_to != "null" ? $date_to : null;
         $previous_balance = 0;
      
-        if ($account_type && $account_id) {
+        if ($account_type ) {
             
             if ($account_type == 'patient') {
                 $query =  $query->where('patient_id', $account_id);
