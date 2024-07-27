@@ -196,7 +196,7 @@
                             echo $row->doctor->name . " (Doctor)";
                         }
                         if ($row->account) {
-                            echo $row->account . " (System)";
+                            echo $row->account . " (Hospital)";
                         }
                         if ($row->ot_attendant_id) {
                             echo $row->otAttendant->name . " (OT Attendant)";

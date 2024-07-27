@@ -32,7 +32,7 @@ class LedgerResource extends Resource
                             'doctor' => 'Doctor',
                             "ot attendant" => "OT Attendant",
                             "aneathesiologist" => "Anesthesiologist",
-                            'system' => 'System',
+                            'system' => 'Hospital',
                         ])
                         ->afterStateUpdated(function (Forms\Get $get, Forms\Set $set) {
                             $set('employee_id', null);
@@ -140,7 +140,7 @@ class LedgerResource extends Resource
                                 return $record->doctor->name . " (Doctor)";
                             }
                             if ($record->account) {
-                                return $record->account . " (System)";
+                                return $record->account . " (Hospital)";
                             }
                             if ($record->ot_attendant_id) {
                                 return $record->otAttendant->name . " (OT Attendant)";
@@ -186,7 +186,7 @@ class LedgerResource extends Resource
                                 'doctor' => 'Doctor',
                                 "ot attendant" => "OT Attendant",
                                 "anesthesiologist" => "Anesthesiologist",
-                                'system' => 'System',
+                                'system' => 'Hospital',
                             ])
                             ->label('Account Type')
                             ->inlineLabel()
