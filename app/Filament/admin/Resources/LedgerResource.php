@@ -188,28 +188,34 @@ class LedgerResource extends Resource
                                 'system' => 'System',
                             ])
                             ->label('Account Type')
+                            ->inlineLabel()
                             ->required(),
                         Forms\Components\Select::make('patient_id')
                             ->relationship('patient', 'name')
                             ->hidden(fn(Forms\Get $get) => $get('account_type') !== 'patient')
                             ->searchable()
+                            ->inlineLabel()
                             ->getOptionLabelFromRecordUsing(fn(Model $record) => "{$record->name} ({$record->phone})")
                             ->required(),
                         Forms\Components\Select::make('employee_id')
                             ->relationship('employee', 'name')
                             ->hidden(fn(Forms\Get $get) => $get('account_type') !== 'employee')
                             ->searchable()
+                            ->inlineLabel()
                             ->required(),
                         Forms\Components\Select::make('doctor_id')
                             ->relationship('doctor', 'name')
+                            ->inlineLabel()
                             ->hidden(fn(Forms\Get $get) => $get('account_type') !== 'doctor')
                             ->required(),
                         Forms\Components\Select::make('ot_attendant_id')
                             ->relationship('otAttendant', 'name')
+                            ->inlineLabel()
                             ->hidden(fn(Forms\Get $get) => $get('account_type') !== 'ot attendant')
                             ->required(),
                         Forms\Components\Select::make('anesthesiologist_id')
                             ->relationship('anesthesiologist', 'name')
+                            ->inlineLabel()
                             ->hidden(fn(Forms\Get $get) => $get('account_type') !== 'anesthesiologist')
                             ->required(),
                         Forms\Components\Select::make('account')
@@ -220,42 +226,45 @@ class LedgerResource extends Resource
                                 "ot expense" => "OT Expense",
                             ])
                             ->label('Account')
+                            ->inlineLabel()
                             ->hidden(fn(Forms\Get $get) => $get('account_type') !== 'system')
                             ->required(),
+                            Forms\Components\DatePicker::make('created_from')->inlineLabel(),
+                            Forms\Components\DatePicker::make('created_until')->inlineLabel(),
+                          
 
                     ])
                     ->query(
                         function (Builder $query, array $data) {
                             if ($data['account_type']) {
                                 if ($data['account_type'] == 'patient') {
+                                    $query->where('patient_id',"!=" , null);
                                     $query->where('patient_id', $data['patient_id']);
                                 }
                                 if ($data['account_type'] == 'employee') {
+                                    $query->where('employee_id',"!=" , null);
                                     $query->where('employee_id', $data['employee_id']);
                                 }
                                 if ($data['account_type'] == 'doctor') {
+                                    $query->where('doctor_id',"!=" , null);
                                     $query->where('doctor_id', $data['doctor_id']);
                                 }
                                 if ($data['account_type'] == 'system') {
+                                    $query->where('account',"!=" , null);
                                     $query->where('account', $data['account']);
                                 }
                                 if ($data['account_type'] == 'ot attendant') {
+                                    $query->where('ot_attendant_id',"!=" , null);
                                     $query->where('ot_attendant_id', $data['ot_attendant_id']);
                                 }
                                 if ($data['account_type'] == 'anesthesiologist') {
+                                    $query->where('anesthesiologist_id',"!=" , null);
                                     $query->where('anesthesiologist_id', $data['anesthesiologist_id']);
                                 }
+                             
 
                             }
-                        }
-                    ),
-                Tables\Filters\Filter::make('created_at')
-                    ->form([
-                        Forms\Components\DatePicker::make('created_from'),
-                        Forms\Components\DatePicker::make('created_until'),
-                    ])
-                    ->query(function (Builder $query, array $data): Builder {
-                        return $query
+                            $query
                             ->when(
                                 $data['created_from'],
                                 fn(Builder $query, $date): Builder => $query->whereDate('created_at', '>=', $date),
@@ -264,10 +273,9 @@ class LedgerResource extends Resource
                                 $data['created_until'],
                                 fn(Builder $query, $date): Builder => $query->whereDate('created_at', '<=', $date),
                             );
-                    })
-
-
-            ])
+                        }
+                        )->columnSpan(5)->columns(4)
+                        ] , layout: Tables\Enums\FiltersLayout::AboveContent)
             ->actions([
                 // Tables\Actions\EditAction::make(),
             ])
