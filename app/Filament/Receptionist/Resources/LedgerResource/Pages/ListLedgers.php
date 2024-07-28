@@ -5,6 +5,8 @@ namespace App\Filament\Receptionist\Resources\LedgerResource\Pages;
 use App\Filament\receptionist\Resources\LedgerResource;
 use ArielMejiaDev\FilamentPrintable\Actions\PrintAction;
 use Filament\Actions;
+use Filament\Forms\Components\DatePicker;
+use Filament\Forms\Components\Select;
 use Filament\Resources\Pages\ListRecords;
 
 class ListLedgers extends ListRecords
@@ -43,8 +45,24 @@ class ListLedgers extends ListRecords
             
                 return (url("/print_ledger/$account_type/$account_id/$date_from/$date_to" ));
             })
-            ->openUrlInNewTab()
-
+            ->openUrlInNewTab(),
+            Actions\Action::make("summary")
+            ->form([
+                Select::make("summary_type")
+                ->options([
+                    "overall" => "Overall Summary",
+                    "doctor" => "Doctor Summary"
+                ])->required(),
+              DatePicker::make('created_from')->required(),
+                DatePicker::make('created_until')->required(),
+            ])->action(function (array $data , $livewire) {
+                $summary_type = $data["summary_type"];
+                $date_from = $data["created_from"];
+                $date_to = $data["created_until"];
+                $livewire->js(
+                    "window.open('/summary_print/$summary_type/$date_from/$date_to','_blank');"
+                );
+            })
         ];
     }
 }

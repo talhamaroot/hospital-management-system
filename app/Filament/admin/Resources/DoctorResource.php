@@ -2,8 +2,6 @@
 
 namespace App\Filament\admin\Resources;
 
-use App\Filament\admin\Resources\DoctorResource\Pages;
-use App\Filament\admin\Resources\DoctorResource\RelationManagers;
 use App\Models\Doctor;
 use Filament\Forms;
 use Filament\Forms\Form;
@@ -58,23 +56,26 @@ class DoctorResource extends Resource
                         ->label('Referred Operation Sharing')
                         ->required(),
 
-
-
                 ])->columns(2),
                 Forms\Components\Section::make([
                     Forms\Components\Repeater::make('operation')
-                    ->relationship('operation')
-                    ->schema([
-                        Forms\Components\Select::make('operation_id')
-                            ->label('Operation')
-                            ->relationship('operation', 'name')
-                            ->required(),
-                        Forms\Components\TextInput::make('price')
-                            ->label('Price')
-                            ->type('number')
-                            ->required(),
+                        ->relationship('operation')
+                        ->schema([
+                            Forms\Components\Select::make('operation_id')
+                                ->label('Operation')
+                                ->relationship('operation', 'name')
+                                ->required(),
+                            Forms\Components\TextInput::make('price')
+                                ->label('Price')
+                                ->type('number')
+                                ->required(),
+                            Forms\Components\TextInput::make('fixed_price')
+                                ->label("Fixed Operation Charges")
+                                ->label('Price')
+                                ->type('number')
+                            ,
 
-                    ])->columns(2)
+                        ])->columns(2),
                 ]),
 
             ]);
@@ -107,15 +108,14 @@ class DoctorResource extends Resource
                     ->searchable()
                     ->sortable(),
 
-
             ])
             ->filters([
                 //
             ])
             ->actions([
                 Tables\Actions\EditAction::make()
-                ->label('View Doctor')
-                ->icon('heroicon-o-eye')
+                    ->label('View Doctor')
+                    ->icon('heroicon-o-eye'),
             ])
             ->bulkActions([
                 Tables\Actions\BulkActionGroup::make([
@@ -127,7 +127,7 @@ class DoctorResource extends Resource
     public static function getRelations(): array
     {
         return [
-            DoctorResource\RelationManagers\LedgerRelationManager::class
+            DoctorResource\RelationManagers\LedgerRelationManager::class,
         ];
     }
 

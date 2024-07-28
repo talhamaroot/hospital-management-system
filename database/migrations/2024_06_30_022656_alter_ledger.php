@@ -12,7 +12,7 @@ return new class extends Migration
     public function up(): void
     {
         Schema::table('ledger', function (Blueprint $table) {
-            $table->enum('account' ,['capital' , 'expense' , 'revenue' , "ot expense" ])->nullable()->after('employee_id');
+            $table->enum('account' ,['capital' , 'expense' , 'revenue' , "ot expense" , "treatment cost"])->nullable()->after('employee_id');
         });
     }
 

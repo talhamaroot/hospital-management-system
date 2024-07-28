@@ -224,6 +224,7 @@ class LedgerResource extends Resource
                                 "expense" => "Expense",
                                 "revenue" => "Revenue",
                                 "ot expense" => "OT Expense",
+                                "treatment cost" => "Treatment Cost"
                             ])
                             ->label('Account')
                             ->inlineLabel()

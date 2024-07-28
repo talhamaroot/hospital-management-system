@@ -3,8 +3,11 @@
 namespace App\Filament\Receptionist\Resources;
 
 
+use App\Models\Ledger;
 use App\Models\Patient;
 use Filament\Forms;
+use Filament\Forms\Components\Select;
+use Filament\Forms\Components\TextInput;
 use Filament\Forms\Form;
 use Filament\Resources\Resource;
 use Filament\Tables;
@@ -107,6 +110,28 @@ class PatientResource extends Resource
             ])
             ->defaultSort('created_at', 'desc')
             ->actions([
+                Tables\Actions\Action::make("treatmentcost")
+                ->label("Treatment Cost")
+                ->form([
+                    TextInput::make("treatmentcost")
+                    ->type("number")
+                    ->required()
+
+                ])
+                ->action(function (array $data , $record) {
+                    Ledger::create([
+                        "account" => "treatment cost",
+                        "debit" => $data["treatmentcost"],
+                        "credit" => 0,
+                        "description" => "Treatment cost Patient ".$record->name,
+                    ]);
+                    Ledger::create([
+                        "patient_id" => $record->id,
+                        "debit" => $data["treatmentcost"],
+                        "credit" => $data["treatmentcost"],
+                        "description" => "Treatment cost ",
+                    ]);
+                }),
                 Tables\Actions\Action::make("View Ledger")
                 ->url(fn ($record) => PatientLedgerResource::getUrl('ledger' , ["record" => $record] )),
                 Tables\Actions\EditAction::make(),

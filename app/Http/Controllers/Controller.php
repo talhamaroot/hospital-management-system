@@ -122,4 +122,35 @@ class Controller extends BaseController
        
         return view('print_ledger', compact('query' , "previous_balance"));
     }
+    public function summary_print($summary_print , $date_from , $date_to){
+        if($summary_print == "overall"){
+            $revenue = Ledger::whereBetween("created_at" , [$date_from , $date_to])->where("account" , "revenue")->sum("debit") - Ledger::whereBetween("created_at" , [$date_from , $date_to])->where("account" , "revenue")->sum("credit");
+            $expense = Ledger::whereBetween("created_at" , [$date_from , $date_to])->where("account" , "expense")->sum("debit") - Ledger::whereBetween("created_at" , [$date_from , $date_to])->where("account" , "expense")->sum("credit");
+            $ot_expense = Ledger::whereBetween("created_at" , [$date_from , $date_to])->where("account" , "ot expense")->sum("debit") - Ledger::whereBetween("created_at" , [$date_from , $date_to])->where("account" , "ot expense")->sum("credit");
+            $treatment_cost = Ledger::whereBetween("created_at" , [$date_from , $date_to])->where("account" , "treatment cost")->sum("debit") - Ledger::whereBetween("created_at" , [$date_from , $date_to])->where("account" , "treatment cost")->sum("credit");
+            $doctor_charges = Ledger::whereBetween("created_at" , [$date_from , $date_to])->whereNotNull("doctor_id" )->sum("debit");
+            $doctor_paid = Ledger::whereBetween("created_at" , [$date_from , $date_to])->whereNotNull("doctor_id" )->sum("credit");
+            $cash_in_hand = Ledger::where("created_at" , "<" , $date_to)->sum("debit") - Ledger::where("created_at" , "<" , $date_to)->sum("credit");
+            $data = [
+                "Revenue" => $revenue,
+                "Expense" => $expense,
+                "OT Expense" => $ot_expense,
+                "Treatment Cost" => $treatment_cost,
+                "Doctor Charges" => $doctor_charges,
+                "Paid to Doctor" => $doctor_paid,
+                "Cash in Hand" => $cash_in_hand,
+            ];
+            return view("summary_print" , compact("data"));
+        } else if ($summary_print == "doctor") {
+            $doctor = Doctor::get();
+            $data = [];
+            foreach($doctor as $row){
+                $doctor_charges = Ledger::whereBetween("created_at" , [$date_from , $date_to])->where("doctor_id" , $row->id)->sum("debit");
+                $doctor_paid = Ledger::whereBetween("created_at" , [$date_from , $date_to])->where("doctor_id" , $row->id)->sum("credit");
+                $data[$row->name ." Charges"] = $doctor_charges;
+                $data[$row->name ." Paid"] = $doctor_paid;
+            }
+            return view("summary_print" , compact("data"));
+        }
+    }
 }

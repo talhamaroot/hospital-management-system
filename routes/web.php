@@ -14,3 +14,4 @@ Route::get("/employee_ledger_report/{id}" , [Controller::class, 'employee_ledger
 Route::get("/attendant_ledger_report/{id}" , [Controller::class, 'attendant_ledger_report'])->name("attendant_ledger_report");
 Route::get("/anesthesiologist_ledger_report/{id}" , [Controller::class, 'anesthesiologist_ledger_report'])->name("anesthesiologist_ledger_report");
 Route::get("/print_ledger/{account_type}/{account_id}/{date_from}/{date_to}", [Controller::class, 'print_ledger'])->name("print_ledger");
+Route::get("/summary_print/{summary_type}/{date_from}/{date_to}", [Controller::class, 'summary_print'])->name("summary_print");

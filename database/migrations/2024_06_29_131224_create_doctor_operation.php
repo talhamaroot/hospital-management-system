@@ -16,6 +16,7 @@ return new class extends Migration
             $table->foreignId('doctor_id')->constrained()->onDelete('cascade');
             $table->foreignId('operation_id')->constrained()->onDelete('cascade');
             $table->decimal('price', 8, 2);
+            $table->decimal('fixed_price', 15, 2);
             $table->timestamps();
         });
     }

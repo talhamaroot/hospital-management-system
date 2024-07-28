@@ -57,7 +57,21 @@ class PatientOperation extends Model implements HasMedia
         if($anesthesiologist_fee){
             $operation_remainns = $operation_remainns - $anesthesiologist_fee;
         }
-        if($this->referred_by == "hospital"){
+        if ($this->doctorOperation->fixed_price > 0){
+            Ledger::create([
+                'doctor_id' => $this->doctorOperation->doctor_id,
+                'debit' => $this->doctorOperation->fixed_price,
+                'credit' => 0,
+                'description' => 'Operation sharing from patient ' . $this->patient->name,
+            ]);
+            Ledger::create([
+                'account' => 'revenue',
+                'debit' => $operation_remainns - $this->doctorOperation->fixed_price,
+                'credit' => 0,
+                'description' => 'Operation sharing from patient ' . $this->patient->name,
+            ]);
+        }
+        else if($this->referred_by == "hospital"){
             Ledger::create([
                 'doctor_id' => $this->doctorOperation->doctor_id,
                 'debit' => $this->doctorOperation->doctor->operation_sharing / 100 * $operation_remainns,

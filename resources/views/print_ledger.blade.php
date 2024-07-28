@@ -228,7 +228,7 @@
 
     window.onafterprint = function(e){
       
-        window.close();
+        // window.close();
     };
     window.print();
 
