@@ -52,7 +52,7 @@ class PatientResource extends Resource
                     Forms\Components\TextInput::make("cnic")
                         ->label("CNIC")
                         ->mask('99999-9999999-9'),
-                    ])->columns(2),
+                    ])->columns(2)->columnSpan(2),
                     Forms\Components\Repeater::make("appointment")
                         ->relationship("appointment")
                         ->schema([
