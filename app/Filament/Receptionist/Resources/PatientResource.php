@@ -6,6 +6,7 @@ namespace App\Filament\Receptionist\Resources;
 use App\Models\Ledger;
 use App\Models\Patient;
 use Filament\Forms;
+use Filament\Forms\Components\Section;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\TextInput;
 use Filament\Forms\Form;
@@ -24,7 +25,9 @@ class PatientResource extends Resource
         return $form
             ->schema([
                 Forms\Components\Section::make([
-                    Forms\Components\TextInput::make("name")
+                    Section::make("Patient Information")
+                    ->schema([
+                        Forms\Components\TextInput::make("name")
                         ->label("Name")
                         ->required(),
 
@@ -49,6 +52,7 @@ class PatientResource extends Resource
                     Forms\Components\TextInput::make("cnic")
                         ->label("CNIC")
                         ->mask('99999-9999999-9'),
+                    ])->columns(2),
                     Forms\Components\Repeater::make("appointment")
                         ->relationship("appointment")
                         ->schema([
