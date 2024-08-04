@@ -58,7 +58,7 @@ class ListLedgers extends ListRecords
                 ])->action(function (array $data, $livewire) {
                 $summary_type = $data["summary_type"];
                 $date_from = $data["created_from"];
-                $date_to = Carbon::parse($data["created_until"])->addDays(1)->format("mm/dd/yyyy");
+                $date_to = Carbon::parse($data["created_until"])->addDays(1)->format("Y-m-d");
                 $livewire->js(
                     "window.open('/summary_print/$summary_type/$date_from/$date_to','_blank');"
                 );
