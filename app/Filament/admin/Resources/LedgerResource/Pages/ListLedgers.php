@@ -3,6 +3,7 @@
 namespace App\Filament\admin\Resources\LedgerResource\Pages;
 
 use App\Filament\admin\Resources\LedgerResource;
+use Carbon\Carbon;
 use Filament\Actions;
 use Filament\Forms\Components\DatePicker;
 use Filament\Forms\Components\Select;
@@ -57,7 +58,7 @@ class ListLedgers extends ListRecords
                 ])->action(function (array $data, $livewire) {
                 $summary_type = $data["summary_type"];
                 $date_from = $data["created_from"];
-                $date_to = $data["created_until"];
+                $date_to = Carbon::parse($data["created_until"])->addDays(1)->format("mm/dd/yyyy");
                 $livewire->js(
                     "window.open('/summary_print/$summary_type/$date_from/$date_to','_blank');"
                 );
