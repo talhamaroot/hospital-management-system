@@ -147,8 +147,11 @@ class Controller extends BaseController
             foreach($doctor as $row){
                 $doctor_charges = Ledger::whereBetween("created_at" , [$date_from , $date_to])->where("doctor_id" , $row->id)->sum("debit");
                 $doctor_paid = Ledger::whereBetween("created_at" , [$date_from , $date_to])->where("doctor_id" , $row->id)->sum("credit");
+                $doctor_patients = PatientAppointment::whereBetween("created_at" , [$date_from , $date_to])->where("doctor_id" , $row->id)->count("id");
+
                 $data[$row->name ." Charges"] = $doctor_charges;
                 $data[$row->name ." Paid"] = $doctor_paid;
+                $data[$row->name ." No of patients"] = $doctor_paid;
             }
             return view("summary_print" , compact("data"));
         }
