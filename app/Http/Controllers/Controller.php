@@ -151,7 +151,7 @@ class Controller extends BaseController
 
                 $data[$row->name ." Charges"] = $doctor_charges;
                 $data[$row->name ." Paid"] = $doctor_paid;
-                $data[$row->name ." No of patients"] = $doctor_paid;
+                $data[$row->name ." No of patients"] = $doctor_patients;
             }
             return view("summary_print" , compact("data"));
         }
